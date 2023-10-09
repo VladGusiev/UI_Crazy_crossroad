@@ -3,21 +3,68 @@ import copy
 from node import Node
 from car import Car
 
+# ------------- CARS LAYOUTS ------------------------------
+# ----------- FROM TASK SITE ------------------------------
+# red = Car("red", 2, 2, 3, "h")
+# orange = Car("orange",2, 1,1, "h")
+# yellow = Car("yellow", 3, 1, 2, "v")
+# pink = Car("pink", 2, 1, 5, "v")
+# green = Car("green", 3, 4, 2, "v")
+# blue = Car("blue", 3, 3, 6, "h")
+# grey = Car("grey", 2, 5, 5, "h")
+# violet = Car("violet", 3, 6, 1, "v")
 
+# --------- 10 STEP SOLUTION ------------------
+# red = Car("red", 2, 2, 3, "h")
+# violet = Car("violet", 3, 6, 1, "v")
+# green = Car("green", 2, 4, 3, "h")
+# blue = Car("blue", 3, 1, 3, "v")
+# yellow = Car("yellow", 2, 5, 5, "v")
+# lightblue = Car("lightblue", 2, 5, 1, "v")
+
+# -------- NO SOLUTION -----------------
+# red = Car("red", 2, 2, 3, "h")
+# orange = Car("orange", 2, 3, 5, "v")
+# yellow = Car("yellow", 2, 1, 6, "h")
+# pink = Car("pink", 3, 4, 6, "h")
+# green = Car("green", 3, 5, 3, "v")
+# blue = Car("blue", 3, 1, 1, "v")
+# darkgrey = Car("darkgrey", 3, 3, 2, "v")
+# cyan = Car("cyan", 3, 2, 1, "h")
+
+# --------- Solution in 5 ----------------
+# red = Car("red", 2, 1, 6, "h")
+# orange = Car("orange", 3, 1, 2, "v")
+# yellow = Car("yellow", 2, 3, 1, "v")
+# pink = Car("pink", 2, 6, 3, "v")
+# green = Car("green", 3, 3, 3, "h")
+# blue = Car("blue", 2, 1, 1, "h")
+# darkgrey = Car("darkgrey", 2, 5, 5, "h")
+# cyan = Car("cyan", 3, 3, 4, "v")
 def generate_cars():
     red = Car("red", 2, 2, 3, "h")
+    orange = Car("orange",2, 1,1, "h")
+    yellow = Car("yellow", 3, 1, 2, "v")
+    pink = Car("pink", 2, 1, 5, "v")
+    green = Car("green", 3, 4, 2, "v")
+    blue = Car("blue", 3, 3, 6, "h")
+    grey = Car("grey", 2, 5, 5, "h")
     violet = Car("violet", 3, 6, 1, "v")
-    green = Car("green", 2, 4, 3, "h")
-    blue = Car("blue", 3, 1, 3, "v")
-    yellow = Car("yellow", 2, 5, 5, "v")
-    lightblue = Car("lightblue", 2, 5, 1, "v")
+
+
+    # lightblue = Car("lightblue", 2, 5, 1, "v")
     return [
         red,
-        violet,
-        # green,
-        blue,
+        orange,
         yellow,
-        lightblue
+        pink,
+        green,
+        blue,
+        grey,
+        violet,
+        # lightblue
+        # darkgrey,
+        # cyan
     ]
 
 
@@ -346,6 +393,7 @@ def is_below_available(state, car, move_by):
 
 def generate_states(root_node):
     root_state = copy.deepcopy(root_node.state)
+    children_list = []
 
     for car in root_state:
         car_copy = copy.deepcopy(car)
@@ -353,37 +401,68 @@ def generate_states(root_node):
             move_by = 1
             # check if move is possible
             while right(root_state, car, move_by):
-                move_by = check_and_write_child_to_state(car, car_copy, move_by, root_node, root_state)
+                state_copy = copy.deepcopy(root_state)
+                hashed_state = hash_state(state_copy)
+                if hashed_state not in already_generated_states:
+                    already_generated_states.append(hashed_state)
+                    # root_node.children.append(Node(root_state))
+                    children_list.append(Node(state_copy, root_node))
+                    for state_car in state_copy:
+                        print(state_car.color, "has coordinates: ", state_car.x, state_car.y)
+                move_by += 1
+                car.x, car.y = car_copy.x, car_copy.y
 
             move_by = 1
             car.x, car.y = car_copy.x, car_copy.y
 
             while left(root_state, car, move_by):
-                move_by = check_and_write_child_to_state(car, car_copy, move_by, root_node, root_state)
+                state_copy = copy.deepcopy(root_state)
+                hashed_state = hash_state(state_copy)
+                if hashed_state not in already_generated_states:
+                    already_generated_states.append(hashed_state)
+
+                    # root_node.children.append(Node(root_state))
+                    children_list.append(Node(state_copy, root_node))
+
+                    for state_car in state_copy:
+                        print(state_car.color, "has coordinates: ", state_car.x, state_car.y)
+                move_by += 1
+                car.x, car.y = car_copy.x, car_copy.y
 
         elif car.orientation == "v":
             move_by = 1
             # check if move is possible
             while up(root_state, car, move_by):
-                move_by = check_and_write_child_to_state(car, car_copy, move_by, root_node, root_state)
+                state_copy = copy.deepcopy(root_state)
+                hashed_state = hash_state(state_copy)
+                if hashed_state not in already_generated_states:
+                    already_generated_states.append(hashed_state)
+                    # root_node.children.append(Node(root_state))
+                    children_list.append(Node(state_copy, root_node))
+
+                    for state_car in state_copy:
+                        print(state_car.color, "has coordinates: ", state_car.x, state_car.y)
+                move_by += 1
+                car.x, car.y = car_copy.x, car_copy.y
 
             move_by = 1
             car.x, car.y = car_copy.x, car_copy.y
 
             while down(root_state, car, move_by):
-                move_by = check_and_write_child_to_state(car, car_copy, move_by, root_node, root_state)
+                state_copy = copy.deepcopy(root_state)
+                hashed_state = hash_state(state_copy)
+                if hashed_state not in already_generated_states:
+                    already_generated_states.append(hashed_state)
+                    # root_node.children.append(Node(root_state))
+                    children_list.append(Node(state_copy, root_node))
 
+                    for state_car in state_copy:
+                        print(state_car.color, "has coordinates: ", state_car.x, state_car.y)
+                move_by += 1
+                car.x, car.y = car_copy.x, car_copy.y
 
-def check_and_write_child_to_state(car, car_copy, move_by, root_node, root_state):
-    hashed_state = hash_state(root_state)
-    if hashed_state not in already_generated_states:
-        already_generated_states.append(hashed_state)
-        root_node.children.append(Node(root_state))
-        for state_car in root_state:
-            print(state_car.color, "has coordinates: ", state_car.x, state_car.y)
-    move_by += 1
-    car.x, car.y = car_copy.x, car_copy.y
-    return move_by
+    # print("List of root nodes children: ", children_list)
+    return children_list
 
 
 # target is pos of red car with size 2: [x] -> [5]
@@ -392,35 +471,55 @@ def check_and_write_child_to_state(car, car_copy, move_by, root_node, root_state
 # TODO This is just IDS, need to implement creation of the tree,
 #  reduction of the duplicates and assigning of the children to parent
 def find_solution(root_node, max_depth):
-    if root_node.state[0].x == 5: return True  # check if red car is already at needed position
+    if max_depth >= 1000:
+        print("No solution was found!")
+        exit(1)
+    if root_node.state[0].x == 5:
+        layer = 1
+        print("Found Answer!")
+        # for state_car in root_node.state:
+        #     print(state_car.color, "has coordinates: ", state_car.x, state_car.y)
+        while not root_node.parent == None:
+            print(layer,  ": ---------------------------")
+            for state_car in root_node.state:
+                print(state_car.color, "has coordinates: ", state_car.x, state_car.y)
+            # print("---------------------------")
 
-    if max_depth <= 0: return False  # reached max depth
+            layer += 1
+            root_node = root_node.parent
 
-    generate_states(root_node)
+        return True  # check if red car is already at needed position
+
+    if max_depth <= 0:
+        print("reached max depth")
+        return False  # reached max depth
+
+    # print("Children list before generation: ", root_node.children)
+    root_node.children = generate_states(root_node)
+    # print("Children list after generation: ", root_node.children)
 
     # check of all children of the node
     for node in root_node.children:
-        if find_solution(node, max_depth-1):
+        if find_solution(node, max_depth - 1):
             return True
     return False
 
 
-
-# TODO i made func "right" to return TRUE/FALSE need to remember to change other the same way!!!
-# TODO FIX  -> Append appends to another list in list!!!
 def main():
     starting_state = generate_cars()
     current_state = copy.deepcopy(starting_state)
 
-    root_node = Node(current_state)
-
+    root_node = Node(copy.deepcopy(current_state), None)
     already_generated_states.append(hash_state(starting_state))
 
-    find_solution(root_node, 1)
-    print(already_generated_states)
-    print(root_node.children)
-    print(len(already_generated_states))
+    depth = 5
+    while not find_solution(root_node, depth):
+        depth += 1
+        already_generated_states.clear()
+        root_node.children.clear()
+    print(depth)
 
+    print(len(already_generated_states))
 
 
 if __name__ == '__main__':
