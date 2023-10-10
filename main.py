@@ -379,12 +379,13 @@ def find_solution(root_node, max_depth):
                 print(f"{state_car.color}: [{state_car.x}:{state_car.y}] | size: {state_car.size} | orientation: {state_car.orientation}")
             layer += 1
             root_node = root_node.parent
+            print(f"Amount of children to this node: {len(root_node.children)}")
         print(layer, " -------------------------------------------------------- ")
         print("Original State:")
         # printing of original state
         for state_car in root_node.state:
-            print(
-                f"{state_car.color}: [{state_car.x}:{state_car.y}] | size: {state_car.size} | orientation: {state_car.orientation}")
+            print(f"{state_car.color}: [{state_car.x}:{state_car.y}] | size: {state_car.size} | orientation: {state_car.orientation}")
+        print(f"Amount of children to this node: {len(root_node.children)}")
         print(" ---------------------------------------------------------- ")
 
 
