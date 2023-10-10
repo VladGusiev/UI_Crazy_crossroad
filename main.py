@@ -17,10 +17,9 @@ from car import Car
 # grey = Car("grey", 2, 5, 5, "h")
 # violet = Car("violet", 3, 6, 1, "v")
 
-# --------- 10 STEP SOLUTION ------------------
+# --------- EASY SOLUTION ------------------
 # red = Car("red", 2, 2, 3, "h")
 # violet = Car("violet", 3, 6, 1, "v")
-# green = Car("green", 2, 4, 3, "h")
 # blue = Car("blue", 3, 1, 3, "v")
 # yellow = Car("yellow", 2, 5, 5, "v")
 # lightblue = Car("lightblue", 2, 5, 1, "v")
@@ -35,7 +34,7 @@ from car import Car
 # darkgrey = Car("darkgrey", 3, 3, 2, "v")
 # cyan = Car("cyan", 3, 2, 1, "h")
 
-# --------- Solution in 5 ----------------
+# --------- Solution in 8 ----------------
 # red = Car("red", 2, 1, 6, "h")
 # orange = Car("orange", 3, 1, 2, "v")
 # yellow = Car("yellow", 2, 3, 1, "v")
@@ -48,22 +47,24 @@ from car import Car
 
 def generate_cars():
     red = Car("red", 2, 2, 3, "h")
+    orange = Car("orange",2, 1,1, "h")
+    yellow = Car("yellow", 3, 1, 2, "v")
+    pink = Car("pink", 2, 1, 5, "v")
+    green = Car("green", 3, 4, 2, "v")
+    blue = Car("blue", 3, 3, 6, "h")
+    grey = Car("grey", 2, 5, 5, "h")
     violet = Car("violet", 3, 6, 1, "v")
-    green = Car("green", 2, 4, 3, "h")
-    blue = Car("blue", 3, 1, 3, "v")
-    yellow = Car("yellow", 2, 5, 5, "v")
-    lightblue = Car("lightblue", 2, 5, 1, "v")
 
     return [
         red,
-        # orange,
+        orange,
         yellow,
-        # pink,
-        # green,
+        pink,
+        green,
         blue,
-        # grey,
+        grey,
         violet,
-        lightblue
+        # lightblue
         # darkgrey,
         # cyan
     ]
@@ -325,59 +326,67 @@ def generate_states(root_node):
             # check if move is possible
             while right(root_state, car, move_by):
                 move_by = check_and_add_potential_state_to_child_list(car, car_copy, children_list, move_by, root_node,
-                                                                      root_state)
+                                                                      root_state, "RIGHT")
 
             move_by = 1
             car.x, car.y = car_copy.x, car_copy.y
 
             while left(root_state, car, move_by):
                 move_by = check_and_add_potential_state_to_child_list(car, car_copy, children_list, move_by, root_node,
-                                                                      root_state)
+                                                                      root_state, "LEFT")
 
         elif car.orientation == "v":
             move_by = 1
             # check if move is possible
             while up(root_state, car, move_by):
                 move_by = check_and_add_potential_state_to_child_list(car, car_copy, children_list, move_by, root_node,
-                                                                      root_state)
+                                                                      root_state, "UP")
 
             move_by = 1
             car.x, car.y = car_copy.x, car_copy.y
 
             while down(root_state, car, move_by):
                 move_by = check_and_add_potential_state_to_child_list(car, car_copy, children_list, move_by, root_node,
-                                                                      root_state)
+                                                                      root_state, "DOWN")
     return children_list
 
 
-def check_and_add_potential_state_to_child_list(car, car_copy, children_list, move_by, root_node, root_state):
+def check_and_add_potential_state_to_child_list(car, car_copy, children_list, move_by, root_node, root_state, operator):
     state_copy = copy.deepcopy(root_state)
     hashed_state = hash_state(state_copy)
     if hashed_state not in already_generated_states:
         already_generated_states.append(hashed_state)
-        children_list.append(Node(state_copy, root_node))
+        children_list.append(Node(state_copy, root_node, f"{car.color} was moved {operator} by {move_by} tiles"))
+
     move_by += 1
     car.x, car.y = car_copy.x, car_copy.y
     return move_by
 
 
 def find_solution(root_node, max_depth):
-    if max_depth >= 1000:
-        print("No solution was found!")
-        exit(1)
+    if max_depth >= 3000:
+        print("No solution was found! (┬┬﹏┬┬)")
+        return True
 
     if root_node.state[0].x == 5: # check if red car is already at needed position
         layer = 1
-        print("Found Answer!")
+        print("Found Answer! (～￣▽￣)～")
         print(" * Final state is first and starting is the last * ")
         while not root_node.parent == None:
             print(layer,  " -------------------------------------------------------- ")
+            print(f"OPERATION: --- {root_node.operation} --- ")
             for state_car in root_node.state:
-                print(state_car.color, "has coordinates: ", state_car.x, state_car.y)
-
+                print(f"{state_car.color}: [{state_car.x}:{state_car.y}] | size: {state_car.size} | orientation: {state_car.orientation}")
             layer += 1
             root_node = root_node.parent
+        print(layer, " -------------------------------------------------------- ")
+        print("Original State:")
+        # printing of original state
+        for state_car in root_node.state:
+            print(
+                f"{state_car.color}: [{state_car.x}:{state_car.y}] | size: {state_car.size} | orientation: {state_car.orientation}")
         print(" ---------------------------------------------------------- ")
+
 
         return True
 
@@ -397,7 +406,7 @@ def main():
     starting_state = generate_cars()
     current_state = copy.deepcopy(starting_state)
 
-    root_node = Node(copy.deepcopy(current_state), None)
+    root_node = Node(copy.deepcopy(current_state), None, None)
     already_generated_states.append(hash_state(starting_state))
 
     depth = 5
@@ -408,6 +417,7 @@ def main():
         root_node.children.clear()
     end_time = time.time()
     print(f"Time needed to find end result was: {end_time - start_time:.2f} seconds")
+    print("Amount of generated original states in final tree: ", len(already_generated_states))
 
 
 if __name__ == '__main__':

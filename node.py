@@ -1,8 +1,6 @@
 class Node:
-    def __init__(self, state, parent):
+    def __init__(self, state, parent, operation):
         self.state = state
-        # self.command = command
-        # self.depth = depth
-        # self.last_moved_car = last_moved_car
         self.parent = parent
+        self.operation = operation
         self.children = []
